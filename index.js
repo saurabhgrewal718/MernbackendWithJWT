@@ -21,5 +21,10 @@ app.use(express.json());
 app.use('/api/user',authRoute);
 app.use('/api/posts',postRoute);
 
+app.get('/', async (req, res) => {
+    res.send('Welcome to my app')
+});
+
+
 
 app.listen(3000,()=> console.log('Server up and running'))
