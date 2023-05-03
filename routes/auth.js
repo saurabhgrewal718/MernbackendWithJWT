@@ -52,4 +52,35 @@ router.post('/signin', async (req,res)=>{
     res.header('token',token).send(token);
 })
 
+
+//change password
+router.put('/users/:id/password', async (req, res) => {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+  
+    try {
+      // Retrieve user from database
+      const user = await User.findById(id);
+  
+      // Verify old password
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid old password' });
+      }
+  
+      // Generate new hashed password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+  
+      // Update user's password in the database
+      user.password = hashedPassword;
+      await user.save();
+  
+      return res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  });
+
 module.exports = router;
